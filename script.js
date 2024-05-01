@@ -30,19 +30,36 @@ if (navigator.geolocation) {
       // L is the namespace of Leaflet so its uses leaflet apii on usch and such variable
       // 2nd value is zoom level
       const map = L.map('map').setView(coords, 13);
+      // now that map is an object of the leaflet library, we can see its methods
+      console.log(map);
 
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      L.marker(coords)
-        .addTo(map)
-        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-        .openPopup();
+      map.on('click', function (mapEvent) {
+        console.log(mapEvent);
+        const { lat, lng } = mapEvent.latlng;
+        L.marker([lat, lng])
+          .addTo(map)
+          .bindPopup(
+            L.popup({
+              maxWidth: 250,
+              minWidth: 100,
+              autoClose: false,
+              closeOnClick: false,
+              className: 'running-popup',
+            })
+          )
+          .setPopupContent('workout')
+          .openPopup();
+      });
     },
     function () {
       alert('could not get your position');
     }
   );
 }
+
+//////////////DISPLAYING A MAP MARKER//////////////
