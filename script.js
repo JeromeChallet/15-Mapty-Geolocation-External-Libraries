@@ -38,6 +38,7 @@ if (navigator.geolocation) {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
+      //////////////DISPLAYING A MAP MARKER//////////////
       map.on('click', function (mapEvent) {
         console.log(mapEvent);
         const { lat, lng } = mapEvent.latlng;
@@ -62,4 +63,4 @@ if (navigator.geolocation) {
   );
 }
 
-//////////////DISPLAYING A MAP MARKER//////////////
+//////////////RENDERING WORKOUT INPUT FORM//////////////
