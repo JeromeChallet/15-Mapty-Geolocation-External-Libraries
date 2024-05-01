@@ -24,6 +24,22 @@ if (navigator.geolocation) {
       console.log(
         `https://www.google.com/maps/@${latitude},${longitude},14z?entry=ttu`
       );
+
+      const coords = [latitude, longitude];
+
+      // L is the namespace of Leaflet so its uses leaflet apii on usch and such variable
+      // 2nd value is zoom level
+      const map = L.map('map').setView(coords, 13);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+        .openPopup();
     },
     function () {
       alert('could not get your position');
