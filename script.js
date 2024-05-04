@@ -77,9 +77,15 @@ class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
-  #workout = [];
+  #workouts = [];
   constructor() {
+    // get user position
     this._getPosition();
+
+    // get data form local storage
+    this._getLocalStorage();
+
+    // attach event handlers
     // we need to use the bind keyword to bind this keyword to the current object
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
@@ -87,14 +93,13 @@ class App {
   }
 
   _getPosition() {
-    if (navigator.geolocation) {
+    if (navigator.geolocation)
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
         function () {
           alert('could not get your position');
         }
       );
-    }
   }
 
   // in a regular function call , the this keyword is set as undefined
@@ -125,6 +130,10 @@ class App {
 
     // handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -196,10 +205,10 @@ class App {
     }
 
     // add new object to workout array
-    this.#workout.push(workout);
+    this.#workouts.push(workout);
 
     // render workout on map as marker
-    this.renderWorkoutMarker(workout);
+    this._renderWorkoutMarker(workout);
 
     // render workout on list
     this._renderWorkout(workout);
@@ -207,9 +216,12 @@ class App {
     // hide form + clear input fields
     // clear input fields
     this._hideForm();
+
+    // set local storage to all workouts
+    this._setLocalStorage();
   }
   // display marker
-  renderWorkoutMarker(workout) {
+  _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
@@ -274,11 +286,12 @@ class App {
     form.insertAdjacentHTML('afterend', html);
   }
   _moveToPopup(e) {
+    if (!this.#map) return;
     const workoutEl = e.target.closest('.workout');
 
     if (!workoutEl) return;
 
-    const workout = this.#workout.find(
+    const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
 
@@ -288,7 +301,29 @@ class App {
         duration: 1,
       },
     });
-    workout.click();
+    //workout.click();
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  // objects coming from local storage will not inherit all the methods
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    if (!data) return;
+
+    this.#workouts = data;
+
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
