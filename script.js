@@ -163,7 +163,7 @@ class App {
   _newWorkout(e) {
     const validInputs = (...inputs) =>
       inputs.every(inp => Number.isFinite(inp));
-    const allPositive = (...inputs) => inputs.every((inp = inp > 0));
+    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
     e.preventDefault();
 
@@ -209,7 +209,7 @@ class App {
 
     // render workout on map as marker
     this._renderWorkoutMarker(workout);
-
+    console.log('jerome: ', workout);
     // render workout on list
     this._renderWorkout(workout);
 
