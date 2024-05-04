@@ -6,6 +6,7 @@ class Workout {
   // every object should have some kind of unique identifier
   // normally a library does that but here the date will be the id
   id = (Date.now() + '').slice(-10);
+  clicks = 0;
   constructor(coords, distance, duration) {
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in km
@@ -19,6 +20,10 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
+  }
+
+  click() {
+    this.clicks++;
   }
 }
 
@@ -70,6 +75,7 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 class App {
   #map;
+  #mapZoomLevel = 13;
   #mapEvent;
   #workout = [];
   constructor() {
@@ -77,6 +83,7 @@ class App {
     // we need to use the bind keyword to bind this keyword to the current object
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -104,7 +111,7 @@ class App {
 
     // L is the namespace of Leaflet so its uses leaflet apii on usch and such variable
     // 2nd value is zoom level
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
     // now that map is an object of the leaflet library, we can see its methods
     console.log(this.#map);
 
@@ -265,6 +272,23 @@ class App {
   </li>`;
 
     form.insertAdjacentHTML('afterend', html);
+  }
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+
+    if (!workoutEl) return;
+
+    const workout = this.#workout.find(
+      work => work.id === workoutEl.dataset.id
+    );
+
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+    workout.click();
   }
 }
 
